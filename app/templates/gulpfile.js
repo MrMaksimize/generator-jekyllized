@@ -28,7 +28,7 @@ gulp.task("clean:prod", del.bind(null, ["site"]));
 
 // Runs the build command for Jekyll to compile the site locally
 // This will build the site with the production settings
-gulp.task("jekyll:dev", $.shell.task("jekyll build"));
+gulp.task("jekyll:dev", $.shell.task("bundle exec jekyll build"));
 gulp.task("jekyll-rebuild", ["jekyll:dev"], function () {
   reload;
 });
@@ -36,7 +36,7 @@ gulp.task("jekyll-rebuild", ["jekyll:dev"], function () {
 // Almost identical to the above task, but instead we load in the build configuration
 // that overwrites some of the settings in the regular configuration so that you
 // don"t end up publishing your drafts or future posts
-gulp.task("jekyll:prod", $.shell.task("jekyll build --config _config.yml,_config.build.yml"));
+gulp.task("jekyll:prod", $.shell.task("bundle exec jekyll build --config _config.yml,_config.build.yml"));
 
 // Compiles the SASS files and moves them into the "assets/stylesheets" directory
 gulp.task("styles", function () {
@@ -199,9 +199,8 @@ gulp.task("deploy", function () {
   // Deploys your optimized site, you can change the settings in the html task if you want to
   return gulp.src("./site/**/*")
     .pipe($.ghPages({
-      // Currently only personal GitHub Pages are supported so it will upload to the master
-      // branch and automatically overwrite anything that is in the directory
-      branch: "master"
+       branch: "gh-pages",
+       cacheDir: ".publish"
       }));
 });<% } %>
 
@@ -215,7 +214,7 @@ gulp.task("jslint", function () {
 
 // Runs "jekyll doctor" on your site to check for errors with your configuration
 // and will check for URL errors a well
-gulp.task("doctor", $.shell.task("jekyll doctor"));
+gulp.task("doctor", $.shell.task("bundle exec jekyll doctor"));
 
 // BrowserSync will serve our site on a local server for us and other devices to use
 // It will also autoreload across all devices as well as keep the viewport synchronized
@@ -226,7 +225,9 @@ gulp.task("serve:dev", ["styles", "jekyll:dev"], function () {
     // tunnel: "",
     server: {
       baseDir: "serve"
-    }
+    },
+    host: process.env.IP || 'localhost',
+    port: process.env.PORT || '3000'
   });
 });
 
