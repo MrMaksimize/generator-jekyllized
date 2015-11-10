@@ -77,7 +77,7 @@ gulp.task("fonts", function () {
 
 // Copy xml and txt files to the "site" directory
 gulp.task("copy", function () {
-  return gulp.src(["serve/*.txt", "serve/*.xml"])
+  return gulp.src(["serve/*.txt", "serve/*.xml", "src/CNAME"])
     .pipe(gulp.dest("site"))
     .pipe($.size({ title: "xml & txt" }))
 });
@@ -197,10 +197,13 @@ gulp.task("deploy", function () {
 // Task to upload your site to your personal GH Pages repo
 gulp.task("deploy", function () {
   // Deploys your optimized site, you can change the settings in the html task if you want to
+  // GH_REF=github.com/user/repo.git
+  var remoteURL = "https://" + process.env.GH_TOKEN + "@" + process.env.GH_REF;
   return gulp.src("./site/**/*")
     .pipe($.ghPages({
        branch: "gh-pages",
-       cacheDir: ".publish"
+       cacheDir: ".publish",
+       remoteURL: remoteURL
       }));
 });<% } %>
 
